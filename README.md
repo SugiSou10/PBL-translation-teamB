@@ -155,3 +155,96 @@ if __name__ == '__main__':
 ~~~
 
 ## Fairseq で学習
+- fairseq-preprocess
+~~~
+#!/bin/bash
+
+TRAIN_DIR=../../data/unigram
+VALID_DIR=../../data/unigram
+TEST_DIR=../../data/unigram
+
+fairseq-preprocess \
+    --destdir ../../data/clean250-bin \  # 保存先
+    --source-lang en \  # ソース言語(ファイルの拡張子)
+    --target-lang ja \  # ターゲット言語(ファイルの拡張子)
+    --trainpref $TRAIN_DIR/clean250 \  # 訓練データのパス
+    --validpref $VALID_DIR/valid \  # 検証データのパス
+    --testpref $TEST_DIR/test \  # テストデータのパス
+    --workers `nproc`
+~~~
+
+- fairseq-train (base)
+~~~
+#!/bin/bash
+
+mkdir -p ../../results/base_5/
+
+CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
+        ../../data/clean250-bin \
+		--arch transformer \
+		--optimizer adam --adam-betas '(0.9,0.98)' \
+		--reset-optimizer --reset-dataloader --reset-meters \
+		--lr 0.001 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-08 --warmup-updates 4000 \
+		--dropout 0.3 --weight-decay 0.001 --clip-norm 1.0 \
+		--criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
+		--max-tokens 4000 --update-freq 128 \
+		--patience 20 \
+		--fp16 \
+		--save-interval-updates 100 --validate-interval-updates 100 \
+		--keep-interval-updates 10 --no-epoch-checkpoints \
+		--best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
+		--eval-bleu \
+		--eval-bleu-args '{"beam": 6, "lenpen": 1.0}' \
+		--eval-bleu-detok space \
+		--eval-bleu-print-samples \
+		--eval-bleu-remove-bpe=sentencepiece \
+		--tensorboard-logdir ../../results/base_5/tensorboard \
+        --save-dir ../../results/base_5/checkpoints/ | tee -a ../../results/base_5/train.log
+~~~
+
+- fairseq-train (big)
+~~~
+#!/bin/bash
+
+mkdir -p ../../results/big_3/
+
+CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
+        ../../data/clean250-bin \
+		--arch transformer \
+		--encoder-layers 6 --encoder-embed-dim 1024 --encoder-ffn-embed-dim 4096 \
+		--decoder-layers 6 --decoder-embed-dim 1024 --decoder-ffn-embed-dim 4096 \
+        --encoder-attention-heads 16 --decoder-attention-heads 16 \
+		--optimizer adam --adam-betas '(0.9,0.98)' \
+		--reset-optimizer --reset-dataloader --reset-meters \
+		--lr 0.001 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-08 --warmup-updates 4000 \
+		--dropout 0.3 --weight-decay 0.001 --clip-norm 1.0 \
+		--criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
+		--max-tokens 2000 --update-freq 256 \
+		--max-update 36000 \
+		--fp16 \
+		--save-interval-updates 100 --validate-interval-updates 100 \
+		--keep-interval-updates 10 --no-epoch-checkpoints \
+		--tensorboard-logdir ../../results/big_3/tensorboard \
+        --save-dir ../../results/big_3/checkpoints/ | tee -a ../../results/big_3/train.log
+~~~
+
+- fairseq-generate
+~~~
+#!/bin/bash
+
+MODEL=base(big)
+
+mkdir -p ../../results/$MODEL/generate
+
+fairseq-generate ../../data/clean250-bin \
+        --path ../../results/$MODEL/checkpoints/checkpoint_best.pt \
+        --batch-size 128 \
+        --beam 5  > ../../results/$MODEL/generate/result.txt
+
+grep "^H-" ../../results/$MODEL/generate/result.txt | sort -V | cut -f3 > ../../results/$MODEL/generate/pred.ja
+~~~
+
+## 評価
+~~~
+cat ../../results/$MODEL/generate/pred.ja | sacrebleu -w2 -l en-ja -t wmt20
+~~~
