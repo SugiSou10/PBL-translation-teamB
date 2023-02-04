@@ -1,7 +1,7 @@
 # PBL-translation-teamB
 2022年学部共通PBL(探求型)翻訳B班
 
-# ディレクトリ構造図
+## ディレクトリ構造図
 
 ~~~
 home/  
@@ -55,7 +55,7 @@ home/
 		           └app.py  
 ~~~
        
-# 仮想環境構築
+## 仮想環境構築
 - Anaconda のインストール
 ~~~
 mkdir Downloads
@@ -71,7 +71,7 @@ conda create -n PBL_t python=3.8 -y
 conda activate PBL_t
 ~~~
 
-# ライブラリのインストール
+## ライブラリのインストール
 ~~~
 mkdir utils
 cd utils
