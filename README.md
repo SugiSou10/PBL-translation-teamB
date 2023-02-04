@@ -180,7 +180,7 @@ sacrebleu -t wmt20 -l en-ja --echo src > raw-corpus/test.en
 sacrebleu -t wmt20 -l en-ja --echo ref > raw-corpus/test.ja
 ~~~
 
-- サブワード分割 (make_unigram.sh)
+- サブワード分割 [make_unigram.sh]
 ~~~
 #!/bin/bash
 
@@ -200,7 +200,7 @@ do
 done
 ~~~
 
-- 文長が長いものを削除 (学習に悪影響、OOM対策) (remove_250.py)
+- 文長が長いものを削除 (学習に悪影響、OOM対策) [remove_250.py]
 ~~~
 def remove_250():
     with open("../unigram-corpus/train.ja", "r") as ja, open("../unigram-corpus/train.en", "r") as en, \
@@ -221,7 +221,7 @@ if __name__ == '__main__':
 ~~~
 
 ## Fairseq で学習
-- fairseq-preprocess (preprocess.sh)
+- fairseq-preprocess [preprocess.sh]
 ~~~
 #!/bin/bash
 
@@ -239,7 +239,7 @@ fairseq-preprocess \
     --workers `nproc`
 ~~~
 
-- fairseq-train (base) (train_base.sh)
+- fairseq-train (base) [train_base.sh]
 ~~~
 #!/bin/bash
 
@@ -268,7 +268,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         --save-dir ../../results/base/checkpoints/ | tee -a ../../results/base/train.log
 ~~~
 
-- fairseq-train (big) (train_big.sh)
+- fairseq-train (big) [train_big.sh]
 ~~~
 #!/bin/bash
 
@@ -294,7 +294,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         --save-dir ../../results/big/checkpoints/ | tee -a ../../results/big/train.log
 ~~~
 
-- fairseq-generate (generate.sh)
+- fairseq-generate [generate.sh]
 ~~~
 #!/bin/bash
 
