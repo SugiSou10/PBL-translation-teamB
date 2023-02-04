@@ -3,6 +3,7 @@
 
 # ディレクトリ構造図
 
+~~~
 home/  
   └sugihara/  
        ├Downloads/  
@@ -43,6 +44,7 @@ home/
 	    └PBL_APPLICATION  
 	            └application/  
 		           └app.py  
+~~~
        
 # 仮想環境構築
 - Anaconda のインストール
