@@ -58,8 +58,11 @@ home/
 # 仮想環境構築
 - Anaconda のインストール
 ~~~
+mkdir Downloads
+cd Downloads
 wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
 bash Anaconda3-2021.05-Linux-x86_64.sh
+cd ..
 ~~~
 
 - 仮想環境の作成、起動
@@ -69,6 +72,10 @@ conda activate PBL_t
 ~~~
 
 # ライブラリのインストール
+~~~
+mkdir utils
+cd utils
+~~~
 - fairseq
 ~~~
 git clone https://github.com/pytorch/fairseq
@@ -129,6 +136,11 @@ pip install sacrebleu
 ~~~
 
 ## データの準備
+~~~
+mkdir data
+cd data
+~~~
+
 - JParaCrawl-v3.0 のダウンロード、解凍
 ~~~
 wget https://www.kecl.ntt.co.jp/icl/lirg/jparacrawl/release/3.0/bitext/en-ja.tar.gz
@@ -136,16 +148,16 @@ tar -zxvf en-ja.tar.gz
 rm -r en-ja.tar.gz
 ~~~
 
-- パラレルコーパス作成
+- パラレルコーパス作成 (make_corpus.py)
 ~~~
 import sys
 
 args = sys.argv
 
-def cut(fname):
+def cut(fname, f_en, f_ja):
     fin = open(fname, "r")
-    f1 = open("train.en", "w")
-    f2 = open("train.ja", "w")
+    f1 = open(f_en, "w")
+    f2 = open(f_ja, "w")
     for line in fin:
         part = line.strip().split("\t")
         f1.write(part[3] + "\n")
@@ -155,7 +167,7 @@ def cut(fname):
     f2.close()
 
 if __name__ == '__main__':
-    cut(args[1])
+    cut(args[1], args[2], args[3])
 ~~~
 
 - 検証・評価用データ (WMT2020)入手
@@ -168,31 +180,31 @@ sacrebleu -t wmt20 -l en-ja --echo src > raw-corpus/test.en
 sacrebleu -t wmt20 -l en-ja --echo ref > raw-corpus/test.ja
 ~~~
 
-- サブワード分割
+- サブワード分割 (make_unigram.sh)
 ~~~
 #!/bin/bash
 
-mkdir -p ../data/unigram-corpus
-mkdir -p ../spm-model
+mkdir -p ../unigram-corpus
+mkdir -p ../../spm-model
 
 # sentencepiece model の学習
-spm_train --input=../data/raw-corpus/train.ja --model_prefix=../spm-model/spm.ja --vocab_size=32000 --character_coverage=0.9995 --model_type=unigram
-spm_train --input=../data/raw-corpus/train.en --model_prefix=../spm-model/spm.en --vocab_size=32000 --character_coverage=1.0 --model_type=unigram --input_sentence_size=14500000 --shuffle_input_sentence=true
+spm_train --input=../raw-corpus/train.ja --model_prefix=../../spm-model/spm.ja --vocab_size=32000 --character_coverage=0.9995 --model_type=unigram
+spm_train --input=../raw-corpus/train.en --model_prefix=../../spm-model/spm.en --vocab_size=32000 --character_coverage=1.0 --model_type=unigram --input_sentence_size=14500000 --shuffle_input_sentence=true
 
-for lang in en ja
+for lang in en
 do
     for type in train valid test
     do
-    spm_encode --model=../spm-model/spm.$lang.model --output_format=piece < ..data/raw-corpus/$type.$lang > ../data/unigram-corpus/$type.$lang
+    spm_encode --model=../../spm-model/spm.$lang.model --output_format=piece < ../raw-corpus/$type.$lang > ../unigram-corpus/$type.$lang
     done
 done
 ~~~
 
-- 文長が長いものを削除 (学習に悪影響、OOM対策)
+- 文長が長いものを削除 (学習に悪影響、OOM対策) (remove_250.py)
 ~~~
 def remove_250():
-    with open("../unigram/train.ja", "r") as ja, open("../unigram/train.en", "r") as en, \
-    open("../unigram/clean250.ja", "w") as f1, open("../unigram/clean250.en", "w") as f2:
+    with open("../unigram-corpus/train.ja", "r") as ja, open("../unigram-corpus/train.en", "r") as en, \
+    open("../unigram-corpus/clean250.ja", "w") as f1, open("../unigram-corpus/clean250.en", "w") as f2:
         for ja_line,en_line in zip(ja, en):
             ja_words = ja_line.strip().split(" ")
             en_words = en_line.strip().split(" ")
@@ -209,7 +221,7 @@ if __name__ == '__main__':
 ~~~
 
 ## Fairseq で学習
-- fairseq-preprocess
+- fairseq-preprocess (preprocess.sh)
 ~~~
 #!/bin/bash
 
@@ -227,7 +239,7 @@ fairseq-preprocess \
     --workers `nproc`
 ~~~
 
-- fairseq-train (base)
+- fairseq-train (base) (train_base.sh)
 ~~~
 #!/bin/bash
 
@@ -256,7 +268,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         --save-dir ../../results/base/checkpoints/ | tee -a ../../results/base/train.log
 ~~~
 
-- fairseq-train (big)
+- fairseq-train (big) (train_big.sh)
 ~~~
 #!/bin/bash
 
@@ -282,7 +294,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         --save-dir ../../results/big/checkpoints/ | tee -a ../../results/big/train.log
 ~~~
 
-- fairseq-generate
+- fairseq-generate (generate.sh)
 ~~~
 #!/bin/bash
 
