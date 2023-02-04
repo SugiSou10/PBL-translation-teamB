@@ -148,7 +148,7 @@ tar -zxvf en-ja.tar.gz
 rm -r en-ja.tar.gz
 ~~~
 
-- パラレルコーパス作成 (make_corpus.py)
+- パラレルコーパス作成 [make_corpus.py]
 ~~~
 import sys
 
