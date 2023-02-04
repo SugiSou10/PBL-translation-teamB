@@ -1,6 +1,49 @@
 # PBL-translation-teamB
 2022年学部共通PBL(探求型)翻訳B班
 
+# ディレクトリ構造図
+
+home/
+  └sugihara/
+       ├Downloads/
+       |    └Anaconda3-2021.05-Linux-x86_64.sh
+       ├utils/
+       |  ├apex/
+       |  ├fairseq/
+       |  ├sentencepiece/
+       |  └vcpkg/
+       └workspace/
+            ├pbl/
+	    | ├data/
+	    | |  ├raw-corpus/
+	    | |  |    ├train.en(ja)
+	    | |  |    ├valid.en(ja)
+	    | |  |    └test.en(ja)
+	    | |  ├scripts/
+	    | |  |   ├make_corpus.py
+	    | |  |   ├make_unigram.py
+	    | |  |   └remove_250.py
+	    | |  └unigram-corpus/
+	    | |          ├train.en(ja)
+	    | |          ├valid.en(ja)
+	    | |          ├test.en(ja)
+	    | |          └clean250.en(ja)
+	    | ├scripts/
+	    | |   ├preprocess/
+	    | |   |     └preprocess.sh
+	    | |   ├train/
+	    | |   |  ├train_base.sh
+	    | |   |  ├train_big.sh
+	    | |   |  └train_efficient.sh
+	    | |   └generate/
+	    | |   　   └generate.sh
+	    | └spm-model/
+	    |      ├spm.en.model(vocab)
+	    |      └spm.ja.model(vocab)
+	    └PBL_APPLICATION
+	            └application/
+		           └app.py
+       
 # 仮想環境構築
 - Anaconda のインストール
 ~~~
