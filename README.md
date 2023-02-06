@@ -1,6 +1,10 @@
 # PBL-translation-teamB
 2022年学部共通PBL(探求型)翻訳B班
 
+## プロジェクトの概要
+英日機械翻訳のWebアプリを作成  
+Transformer-baseを基準として、モデルサイズ・翻訳にかかる時間に関して効率の良いモデルを作成
+
 ## ディレクトリ構造図
 
 ~~~
@@ -220,10 +224,10 @@ if __name__ == '__main__':
 学習を行うための準備
 
 - train_base.sh  
-Transformer-Baseの学習
+Transformer-baseの学習
 
 - train_big.sh  
-Transformer-Bigの学習
+Transformer-bigの学習
 
 - generate.sh  
 テストデータを用いて学習した翻訳器を評価
