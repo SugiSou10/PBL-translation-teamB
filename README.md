@@ -157,6 +157,9 @@ Transformer-bigの学習
 
 ## Webアプリの使い方
 - app.py を実行  
+- flask run --host=0.0.0.0を実行  
+- Running on http://133.71.101.87:5000と表示される
+- http://133.71.101.87:5000に移動すると翻訳画面が表示される
 - 左の枠内に翻訳したい英文を入力し、真ん中の翻訳ボタンを押す。
 
 ![スクリーンショット (26)](https://user-images.githubusercontent.com/115621597/216903794-7743bd8c-8f55-49d8-b36c-f5e461c2e4f7.png)
