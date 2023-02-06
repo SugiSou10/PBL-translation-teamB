@@ -80,7 +80,7 @@ conda activate PBL_t
 mkdir utils
 cd utils
 ~~~
-- fairseq (ver.0.12.2)
+- fairseq (Ver.0.12.2)
 ~~~
 git clone https://github.com/pytorch/fairseq
 cd fairseq
@@ -88,7 +88,7 @@ pip install --editable ./
 cd ..
 ~~~
 
-- apex (ver.0.1)
+- apex (Ver.0.1)
 ~~~
 git clone https://github.com/NVIDIA/apex
 cd apex
@@ -96,7 +96,7 @@ CUDA_HOME=/usr/local/cuda-11.3 pip install -v --no-cache-dir --global-option="--
 cd ..
 ~~~
 
-- sentencepiece (0.1.97)
+- sentencepiece (Ver.0.1.97)
 ~~~
 git clone https://github.com/google/sentencepiece.git 
 cd sentencepiece
@@ -129,7 +129,7 @@ which spm_train
 which spm_encode
 ~~~
 
-- sacrebleu (ver.2.3.1)
+- sacrebleu (Ver.2.3.1)
 ~~~
 pip install sacrebleu
 ~~~
