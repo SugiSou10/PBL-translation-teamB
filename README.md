@@ -29,8 +29,8 @@ home/
 	    | |  |
 	    | |  ├scripts/  
 	    | |  |   ├make_corpus.py  
-	    | |  |   ├make_unigram.py  
-	    | |  |   └remove_250.py  
+	    | |  |   ├remove_250.py  
+	    | |  |   └create_data.sh
 	    | |  |
 	    | |  └unigram-corpus/  
 	    | |          ├train.en(ja)  
@@ -135,89 +135,12 @@ pip install sacrebleu
 ~~~
 
 ## データの準備
-~~~
-mkdir data
-cd data
-~~~
-
-- JParaCrawl-v3.0 のダウンロード、解凍
-~~~
-wget https://www.kecl.ntt.co.jp/icl/lirg/jparacrawl/release/3.0/bitext/en-ja.tar.gz
-tar -zxvf en-ja.tar.gz
-rm -r en-ja.tar.gz
-~~~
-
-- パラレルコーパス作成 [make_corpus.py]
-~~~
-import sys
-
-args = sys.argv
-
-def cut(fname, f_en, f_ja):
-    fin = open(fname, "r")
-    f1 = open(f_en, "w")
-    f2 = open(f_ja, "w")
-    for line in fin:
-        part = line.strip().split("\t")
-        f1.write(part[3] + "\n")
-        f2.write(part[4] + "\n")       
-    fin.close()
-    f1.close()
-    f2.close()
-
-if __name__ == '__main__':
-    cut(args[1], args[2], args[3])
-~~~
-
-- 検証・評価用データ (WMT2020)　入手
-~~~
-mkdir raw-corpus
-
-sacrebleu -t wmt20/dev -l en-ja --echo src > raw-corpus/valid.en
-sacrebleu -t wmt20/dev -l en-ja --echo ref > raw-corpus/valid.ja
-sacrebleu -t wmt20 -l en-ja --echo src > raw-corpus/test.en
-sacrebleu -t wmt20 -l en-ja --echo ref > raw-corpus/test.ja
-~~~
-
-- サブワード分割 [make_unigram.sh]
-~~~
-#!/bin/bash
-
-mkdir -p ../unigram-corpus
-mkdir -p ../../spm-model
-
-# sentencepiece model の学習
-spm_train --input=../raw-corpus/train.ja --model_prefix=../../spm-model/spm.ja --vocab_size=32000 --character_coverage=0.9995 --model_type=unigram
-spm_train --input=../raw-corpus/train.en --model_prefix=../../spm-model/spm.en --vocab_size=32000 --character_coverage=1.0 --model_type=unigram --input_sentence_size=14500000 --shuffle_input_sentence=true
-
-for lang in en
-do
-    for type in train valid test
-    do
-    spm_encode --model=../../spm-model/spm.$lang.model --output_format=piece < ../raw-corpus/$type.$lang > ../unigram-corpus/$type.$lang
-    done
-done
-~~~
-
-- 文長が長いものを削除 (学習に悪影響、OOM対策) [remove_250.py]
-~~~
-def remove_250():
-    with open("../unigram-corpus/train.ja", "r") as ja, open("../unigram-corpus/train.en", "r") as en, \
-    open("../unigram-corpus/clean250.ja", "w") as f1, open("../unigram-corpus/clean250.en", "w") as f2:
-        for ja_line,en_line in zip(ja, en):
-            ja_words = ja_line.strip().split(" ")
-            en_words = en_line.strip().split(" ")
-            if len(ja_words) < 250 and len(en_words) < 250:
-                f1.write(ja_line)
-                f2.write(en_line)
-
-def main():
-    remove_250()
-
-
-if __name__ == '__main__':
-    main()
-~~~
+- create_data.sh
+JParaCrawl-v3.0 のダウンロード、解凍  
+パラレルコーパス作成 (make_corpus.py の実行)  
+検証・評価用データ (WMT2020)　入手  
+サブワード分割  
+学習に悪影響であることと、OOM対策のため文長が長いものを削除  (remove_250.py の実行)
 
 ## Fairseq で学習
 - preprocess.sh  
