@@ -156,6 +156,7 @@ Transformer-bigの学習
 テストデータを用いて学習した翻訳器を評価
 
 ## Webアプリの使い方
+- app.py を実行  
 - 左の枠内に翻訳したい英文を入力し、真ん中の翻訳ボタンを押す。
 
 ![スクリーンショット (26)](https://user-images.githubusercontent.com/115621597/216903794-7743bd8c-8f55-49d8-b36c-f5e461c2e4f7.png)
