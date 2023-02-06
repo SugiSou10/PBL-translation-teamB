@@ -129,7 +129,7 @@ which spm_train
 which spm_encode
 ~~~
 
-- sacrebleu install (ver.2.3.1)
+- sacrebleu (ver.2.3.1)
 ~~~
 pip install sacrebleu
 ~~~
