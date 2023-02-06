@@ -76,7 +76,7 @@ conda activate PBL_t
 mkdir utils
 cd utils
 ~~~
-- fairseq
+- fairseq (ver.0.12.2)
 ~~~
 git clone https://github.com/pytorch/fairseq
 cd fairseq
@@ -84,7 +84,7 @@ pip install --editable ./
 cd ..
 ~~~
 
-- apex
+- apex (ver.0.1)
 ~~~
 git clone https://github.com/NVIDIA/apex
 cd apex
@@ -92,7 +92,7 @@ CUDA_HOME=/usr/local/cuda-11.3 pip install -v --no-cache-dir --global-option="--
 cd ..
 ~~~
 
-- sentencepiece
+- sentencepiece (0.1.97)
 ~~~
 git clone https://github.com/google/sentencepiece.git 
 cd sentencepiece
@@ -125,12 +125,7 @@ which spm_train
 which spm_encode
 ~~~
 
-- sentencepiece install
-~~~
-pip install sentencepiece
-~~~
-
-- sacrebleu install
+- sacrebleu install (ver.2.3.1)
 ~~~
 pip install sacrebleu
 ~~~
@@ -170,7 +165,7 @@ if __name__ == '__main__':
     cut(args[1], args[2], args[3])
 ~~~
 
-- 検証・評価用データ (WMT2020)入手
+- 検証・評価用データ (WMT2020)　入手
 ~~~
 mkdir raw-corpus
 
@@ -222,95 +217,14 @@ if __name__ == '__main__':
 
 ## Fairseq で学習
 - fairseq-preprocess [preprocess.sh]
-~~~
-#!/bin/bash
+学習を行うための準備
 
-TRAIN_DIR=../../data/unigram
-VALID_DIR=../../data/unigram
-TEST_DIR=../../data/unigram
+- fairseq-train (Base) [train_base.sh]
+Transformer-Baseの学習
 
-fairseq-preprocess \
-    --destdir ../../data/clean250-bin \  # 保存先
-    --source-lang en \  # ソース言語(ファイルの拡張子)
-    --target-lang ja \  # ターゲット言語(ファイルの拡張子)
-    --trainpref $TRAIN_DIR/clean250 \  # 訓練データのパス
-    --validpref $VALID_DIR/valid \  # 検証データのパス
-    --testpref $TEST_DIR/test \  # テストデータのパス
-    --workers `nproc`
-~~~
-
-- fairseq-train (base) [train_base.sh]
-~~~
-#!/bin/bash
-
-mkdir -p ../../results/base/
-
-CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
-        ../../data/clean250-bin \
-		--arch transformer \
-		--optimizer adam --adam-betas '(0.9,0.98)' \
-		--reset-optimizer --reset-dataloader --reset-meters \
-		--lr 0.001 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-08 --warmup-updates 4000 \
-		--dropout 0.3 --weight-decay 0.001 --clip-norm 1.0 \
-		--criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
-		--max-tokens 4000 --update-freq 128 \
-		--patience 20 \
-		--fp16 \
-		--save-interval-updates 100 --validate-interval-updates 100 \
-		--keep-interval-updates 10 --no-epoch-checkpoints \
-		--best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
-		--eval-bleu \
-		--eval-bleu-args '{"beam": 6, "lenpen": 1.0}' \
-		--eval-bleu-detok space \
-		--eval-bleu-print-samples \
-		--eval-bleu-remove-bpe=sentencepiece \
-		--tensorboard-logdir ../../results/base/tensorboard \
-        	--save-dir ../../results/base/checkpoints/ | tee -a ../../results/base/train.log
-~~~
-
-- fairseq-train (big) [train_big.sh]
-~~~
-#!/bin/bash
-
-mkdir -p ../../results/big/
-
-CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
-        ../../data/clean250-bin \
-		--arch transformer \
-		--encoder-layers 6 --encoder-embed-dim 1024 --encoder-ffn-embed-dim 4096 \
-		--decoder-layers 6 --decoder-embed-dim 1024 --decoder-ffn-embed-dim 4096 \
-        	--encoder-attention-heads 16 --decoder-attention-heads 16 \
-		--optimizer adam --adam-betas '(0.9,0.98)' \
-		--reset-optimizer --reset-dataloader --reset-meters \
-		--lr 0.001 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-08 --warmup-updates 4000 \
-		--dropout 0.3 --weight-decay 0.001 --clip-norm 1.0 \
-		--criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
-		--max-tokens 2000 --update-freq 256 \
-		--max-update 36000 \
-		--fp16 \
-		--save-interval-updates 100 --validate-interval-updates 100 \
-		--keep-interval-updates 10 --no-epoch-checkpoints \
-		--tensorboard-logdir ../../results/big/tensorboard \
-        	--save-dir ../../results/big/checkpoints/ | tee -a ../../results/big/train.log
-~~~
+- fairseq-train (Big) [train_big.sh]
+Transformer-Bigの学習
 
 - fairseq-generate [generate.sh]
-~~~
-#!/bin/bash
+テストデータを用いて学習した翻訳器を評価
 
-MODEL=base (big)
-
-mkdir -p ../../results/$MODEL/generate
-
-fairseq-generate ../../data/clean250-bin \
-        --path ../../results/$MODEL/checkpoints/checkpoint_best.pt \
-        --batch-size 128 \
-        --beam 5  > ../../results/$MODEL/generate/result.txt
-
-grep "^H-" ../../results/$MODEL/generate/result.txt | sort -V | cut -f3 > ../../results/$MODEL/generate/pred.ja
-~~~
-
-## 評価
-~~~
-cat ../../results/$MODEL/generate/pred.ja | sacrebleu -w2 -l en-ja -t wmt20
-~~~
