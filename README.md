@@ -216,15 +216,15 @@ if __name__ == '__main__':
 ~~~
 
 ## Fairseq で学習
-- fairseq-preprocess [preprocess.sh]
+- fairseq-preprocess [preprocess.sh]  
 学習を行うための準備
 
-- fairseq-train (Base) [train_base.sh]
+- fairseq-train (Base) [train_base.sh]  
 Transformer-Baseの学習
 
-- fairseq-train (Big) [train_big.sh]
+- fairseq-train (Big) [train_big.sh]  
 Transformer-Bigの学習
 
-- fairseq-generate [generate.sh]
+- fairseq-generate [generate.sh]  
 テストデータを用いて学習した翻訳器を評価
 
