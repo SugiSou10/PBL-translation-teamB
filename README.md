@@ -136,11 +136,11 @@ pip install sacrebleu
 
 ## データの準備
 - create_data.sh  
-	-JParaCrawl-v3.0 のダウンロード、解凍  
-	-パラレルコーパス作成 (make_corpus.py の実行)  
-	-検証・評価用データ (WMT2020)　入手  
-	-サブワード分割  
-	-学習に悪影響であることと、OOM対策のため文長が長いものを削除  (remove_250.py の実行)
+	- JParaCrawl-v3.0 のダウンロード、解凍  
+	- パラレルコーパス作成 (make_corpus.py の実行)  
+	- 検証・評価用データ (WMT2020)　入手  
+	- サブワード分割  
+	- 学習に悪影響であることと、OOM対策のため文長が長いものを削除  (remove_250.py の実行)
 
 ## Fairseq で学習
 - preprocess.sh  
