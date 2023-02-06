@@ -135,7 +135,7 @@ pip install sacrebleu
 ~~~
 
 ## データの準備
-- create_data.sh
+- create_data.sh  
 JParaCrawl-v3.0 のダウンロード、解凍  
 パラレルコーパス作成 (make_corpus.py の実行)  
 検証・評価用データ (WMT2020)　入手  
