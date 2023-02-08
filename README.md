@@ -20,7 +20,7 @@ home/
        |  └vcpkg/  
        |
        └workspace/  
-        ├pbl/  
+            ├pbl/  
 	    | ├data/  
 	    | |  ├raw-corpus/  
 	    | |  |    ├train.en(ja)  
