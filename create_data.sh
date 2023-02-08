@@ -7,6 +7,7 @@ wget https://www.kecl.ntt.co.jp/icl/lirg/jparacrawl/release/3.0/bitext/en-ja.tar
 tar -zxvf en-ja.tar.gz
 rm -r en-ja.tar.gz
 
+mkdir raw-corpus
 cd scripts
 
 # パラレルコーパス作成
@@ -15,7 +16,6 @@ python make_corpus.py ../en-ja/en-ja.bicleaner05.txt ../raw-corpus/train.en ../r
 cd ..
 
 # 検証・評価用データ (WMT2020) 入手
-mkdir raw-corpus
 
 sacrebleu -t wmt20/dev -l en-ja --echo src > raw-corpus/valid.en
 sacrebleu -t wmt20/dev -l en-ja --echo ref > raw-corpus/valid.ja
