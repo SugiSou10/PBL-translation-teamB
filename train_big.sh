@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p ../../results/big_3/
+mkdir -p ../../results/big/
 
 CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         ../../data/clean250-bin \
@@ -18,5 +18,5 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
 		--fp16 \
 		--save-interval-updates 100 --validate-interval-updates 100 \
 		--keep-interval-updates 10 --no-epoch-checkpoints \
-		--tensorboard-logdir ../../results/big_3/tensorboard \
-        --save-dir ../../results/big_3/checkpoints/ | tee -a ../../results/big_3/train.log
+		--tensorboard-logdir ../../results/big/tensorboard \
+        --save-dir ../../results/big/checkpoints/ | tee -a ../../results/big/train.log
