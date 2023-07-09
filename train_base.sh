@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p ../../results/base_5/
+mkdir -p ../../results/base/
 
 CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
         ../../data/clean250-bin \
@@ -21,5 +21,5 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train \
 		--eval-bleu-detok space \
 		--eval-bleu-print-samples \
 		--eval-bleu-remove-bpe=sentencepiece \
-		--tensorboard-logdir ../../results/base_5/tensorboard \
-        --save-dir ../../results/base_5/checkpoints/ | tee -a ../../results/base_5/train.log
+		--tensorboard-logdir ../../results/base/tensorboard \
+        --save-dir ../../results/base/checkpoints/ | tee -a ../../results/base/train.log
